@@ -34,7 +34,23 @@ This creates a global symlink that other projects can reference.
 
 ## Using the Linked SDK in Your Project
 
-### 1. Link the SDK to Your Project
+### 1. Remove the Published Version (If Already Installed)
+
+If your project already has `@1inch/cross-chain-sdk` in its `package.json`, you need to remove it first:
+
+```json
+// In your package.json, remove this line from dependencies:
+"@1inch/cross-chain-sdk": "v0.1.15-rc.0",  // Remove this entire line
+```
+
+Then clean the installed packages:
+
+```bash
+cd /path/to/your/project
+pnpm install
+```
+
+### 2. Link the SDK to Your Project
 
 Navigate to your project directory and link the SDK:
 
@@ -43,15 +59,15 @@ cd /path/to/your/project
 pnpm link --global @1inch/cross-chain-sdk
 ```
 
-### 2. Install Dependencies
+### 3. Install Dependencies
 
-Make sure your project has the necessary peer dependencies installed:
+Reinstall dependencies to ensure everything works with the linked version:
 
 ```bash
 pnpm install
 ```
 
-### 3. Use the SDK in Your Code
+### 4. Use the SDK in Your Code
 
 You can now import and use the SDK as normal:
 
@@ -102,7 +118,7 @@ pnpm qa:fix
 
 ## Unlinking the SDK
 
-When you're done with local development and want to use the published version:
+When you're done with local development and want to switch back to the published version:
 
 ### 1. Unlink from Your Project
 
@@ -111,13 +127,23 @@ cd /path/to/your/project
 pnpm unlink @1inch/cross-chain-sdk
 ```
 
-### 2. Install the Published Version
+### 2. Add the Published Version Back to package.json
 
-```bash
-pnpm install @1inch/cross-chain-sdk
+Add the SDK back to your `package.json` dependencies:
+
+```json
+"dependencies": {
+  "@1inch/cross-chain-sdk": "v0.1.15-rc.0"
+}
 ```
 
-### 3. Remove Global Link (Optional)
+### 3. Install the Published Version
+
+```bash
+pnpm install
+```
+
+### 4. Remove Global Link (Optional)
 
 ```bash
 cd /path/to/cross-chain-sdk
