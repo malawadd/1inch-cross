@@ -1,229 +1,158 @@
-# Cross Chain SDK
-Sdk for creating atomic swaps through 1inch
+# Cross Chain SDK - Local Development Guide
 
-## Resources
-- [Dev portal](https://portal.1inch.dev/documentation/apis/swap/fusion-plus/introduction)
+This guide is for team members who need to use a locally developed version of the Cross Chain SDK in other projects.
 
-## Docs
-- [WebSocket](https://github.com/1inch/cross-chain-sdk/tree/master/src/ws-api)
+## Prerequisites
 
-# Installation
+- Node.js (version 18.16.0 or higher)
+- pnpm package manager
 
-`npm install @1inch/cross-chain-sdk`
+## Setting Up the SDK for Local Development
 
-# Setup
-```typescript
-const privateKey =  '0x'  
-const rpc = 'https://ethereum-rpc.publicnode.com'  
-const authKey = 'auth-key'  
-const source = 'sdk-tutorial'  
-  
-const web3 = new Web3(rpc)  
-const walletAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address  
-  
-const sdk = new SDK({  
-    url: 'https://api.1inch.dev/fusion-plus',  
-    authKey,  
-    blockchainProvider: new PrivateKeyProviderConnector(privateKey, web3) // only required for order creation  
-})  
+### 1. Clone and Setup the SDK Repository
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd cross-chain-sdk
+
+# Install dependencies
+pnpm install
+
+# Build the SDK
+pnpm build
 ```
 
-# Order creation
-To create order it is required that wallet has enough allowance of `srcTokenAddress`  for `Limit Order Protocol` on source chain
-```typescript
-// 10 USDT (Polygon) -> BNB (BSC)  
-  
-// estimate    
-const quote = await sdk.getQuote({  
-	amount: '10000000',  
-	srcChainId: NetworkEnum.POLYGON,  
-	dstChainId: NetworkEnum.BINANCE,  
-	enableEstimate: true,  
-	srcTokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT  
-	dstTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // BNB  
-	walletAddress  
-})  
+### 2. Create a Global Link
 
-const preset = PresetEnum.fast  
-
-// generate secrets  
-const secrets = Array.from({  
-	length: quote.presets[preset].secretsCount  
-}).map(() => '0x' + randomBytes(32).toString('hex'))  
-
-const hashLock =  
-	secrets.length === 1  
-		? HashLock.forSingleFill(secrets[0])  
-		: HashLock.forMultipleFills(HashLock.getMerkleLeaves(secrets))  
-
-const secretHashes = secrets.map((s) => HashLock.hashSecret(s))  
-
-// create order  
-const {hash, quoteId, order} = await sdk.createOrder(quote, {  
-	walletAddress,  
-	hashLock,  
-	preset,  
-	source,  
-	secretHashes  
-})  
-console.log({hash}, 'order created')  
+```bash
+# Create a global symlink for the SDK
+pnpm link --global
 ```
 
-# Order submission
-```typescript
-// submit order  
-const _orderInfo = await sdk.submitOrder(  
-	quote.srcChainId,  
-	order,  
-	quoteId,  
-	secretHashes  
-)  
-console.log({hash}, 'order submitted')  
+This creates a global symlink that other projects can reference.
+
+## Using the Linked SDK in Your Project
+
+### 1. Link the SDK to Your Project
+
+Navigate to your project directory and link the SDK:
+
+```bash
+cd /path/to/your/project
+pnpm link --global @1inch/cross-chain-sdk
 ```
 
-# Secret submission
-Each time when resolver deploys source and destination escrow - user must submit appropriate secret, so resolver can finish swap
+### 2. Install Dependencies
 
-```typescript
- // submit secrets for deployed escrows  
-while (true) {  
-	const secretsToShare = await sdk.getReadyToAcceptSecretFills(hash)  
+Make sure your project has the necessary peer dependencies installed:
 
-	if (secretsToShare.fills.length) {  
-		for (const {idx} of secretsToShare.fills) {  
-			await sdk.submitSecret(hash, secrets[idx])  
-
-			console.log({idx}, 'shared secret')  
-		}  
-	}  
-
-	// check if order finished  
-	const {status} = await sdk.getOrderStatus(hash)  
-
-	if (  
-		status === OrderStatus.Executed ||  
-		status === OrderStatus.Expired ||  
-		status === OrderStatus.Refunded  
-	) {  
-		break  
-	}  
-
-	await sleep(1000)  
-}  
-
-const statusResponse = await sdk.getOrderStatus(hash)  
-
-console.log(statusResponse)  
+```bash
+pnpm install
 ```
 
-# Whole script
+### 3. Use the SDK in Your Code
+
+You can now import and use the SDK as normal:
+
 ```typescript
-import {  
-    HashLock,  
-    NetworkEnum,  
-    OrderStatus,  
-    PresetEnum,  
-    PrivateKeyProviderConnector,  
-    SDK  
-} from '@1inch/cross-chain-sdk'  
-import Web3 from 'web3'  
-import {randomBytes} from 'node:crypto'  
-  
-const privateKey =  '0x'  
-const rpc = 'https://ethereum-rpc.publicnode.com'  
-const authKey = 'auth-key'  
-const source = 'sdk-tutorial'  
-  
-const web3 = new Web3(rpc)  
-const walletAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address  
-  
-const sdk = new SDK({  
-    url: 'https://api.1inch.dev/fusion-plus',  
-    authKey,  
-    blockchainProvider: new PrivateKeyProviderConnector(privateKey, web3) // only required for order creation  
-})  
-  
-async function sleep(ms: number): Promise<void> {  
-    return new Promise((resolve) => setTimeout(resolve, ms))  
-}  
-  
-async function main(): Promise<void> {  
-    // 10 USDT (Polygon) -> BNB (BSC)  
-  
-    // estimate    
-    const quote = await sdk.getQuote({  
-        amount: '10000000',  
-        srcChainId: NetworkEnum.POLYGON,  
-        dstChainId: NetworkEnum.BINANCE,  
-        enableEstimate: true,  
-        srcTokenAddress: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT  
-        dstTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // BNB  
-        walletAddress  
-    })  
-  
-    const preset = PresetEnum.fast  
-  
-    // generate secrets  
-    const secrets = Array.from({  
-        length: quote.presets[preset].secretsCount  
-    }).map(() => '0x' + randomBytes(32).toString('hex'))  
-  
-    const hashLock =  
-        secrets.length === 1  
-            ? HashLock.forSingleFill(secrets[0])  
-            : HashLock.forMultipleFills(HashLock.getMerkleLeaves(secrets))  
-  
-    const secretHashes = secrets.map((s) => HashLock.hashSecret(s))  
-    
-    // create order  
-    const {hash, quoteId, order} = await sdk.createOrder(quote, {  
-        walletAddress,  
-        hashLock,  
-        preset,  
-        source,  
-        secretHashes  
-    })  
-    console.log({hash}, 'order created')  
-  
-    // submit order  
-    const _orderInfo = await sdk.submitOrder(  
-        quote.srcChainId,  
-        order,  
-        quoteId,  
-        secretHashes  
-    )  
-    console.log({hash}, 'order submitted')  
-  
-    // submit secrets for deployed escrows  
-    while (true) {  
-        const secretsToShare = await sdk.getReadyToAcceptSecretFills(hash)  
-  
-        if (secretsToShare.fills.length) {  
-            for (const {idx} of secretsToShare.fills) {  
-                await sdk.submitSecret(hash, secrets[idx])  
-  
-                console.log({idx}, 'shared secret')  
-            }  
-        }  
-  
-        // check if order finished  
-        const {status} = await sdk.getOrderStatus(hash)  
-  
-        if (  
-            status === OrderStatus.Executed ||  
-            status === OrderStatus.Expired ||  
-            status === OrderStatus.Refunded  
-        ) {  
-            break  
-        }  
-  
-        await sleep(1000)  
-    }  
-  
-    const statusResponse = await sdk.getOrderStatus(hash)  
-  
-    console.log(statusResponse)  
-}  
-  
-main()
+import { SDK, NetworkEnum, HashLock } from '@1inch/cross-chain-sdk'
+
+const sdk = new SDK({
+    url: 'https://api.1inch.dev/fusion-plus',
+    authKey: 'your-auth-key'
+})
 ```
+
+## Making Changes to the SDK
+
+When you make changes to the SDK code:
+
+### 1. Rebuild the SDK
+
+```bash
+cd /path/to/cross-chain-sdk
+pnpm build
+```
+
+### 2. Restart Your Development Server
+
+The changes should be automatically picked up by your linked project. If not, restart your development server.
+
+## Development Commands
+
+While working on the SDK, you can use these commands:
+
+```bash
+# Run tests
+pnpm test
+
+# Run linter
+pnpm lint
+
+# Fix linting issues
+pnpm lint --fix
+
+# Type checking
+pnpm lint:types
+
+# Run all quality checks
+pnpm qa:fix
+```
+
+## Unlinking the SDK
+
+When you're done with local development and want to use the published version:
+
+### 1. Unlink from Your Project
+
+```bash
+cd /path/to/your/project
+pnpm unlink @1inch/cross-chain-sdk
+```
+
+### 2. Install the Published Version
+
+```bash
+pnpm install @1inch/cross-chain-sdk
+```
+
+### 3. Remove Global Link (Optional)
+
+```bash
+cd /path/to/cross-chain-sdk
+pnpm unlink --global
+```
+
+## Troubleshooting
+
+### Link Not Working
+
+If the link isn't working properly:
+
+1. Make sure you've built the SDK (`pnpm build`)
+2. Check that the global link exists: `pnpm list --global --depth=0`
+3. Try unlinking and relinking both globally and in your project
+
+### TypeScript Issues
+
+If you're experiencing TypeScript issues:
+
+1. Make sure the SDK is built (`pnpm build`)
+2. Restart your TypeScript language server
+3. Check that your project's TypeScript version is compatible
+
+### Dependency Conflicts
+
+If you encounter dependency conflicts:
+
+1. Check that peer dependencies are properly installed
+2. Consider using `pnpm install --shamefully-hoist` in your project
+3. Ensure Node.js versions match between SDK and your project
+
+## Notes
+
+- Always rebuild the SDK after making changes (`pnpm build`)
+- The linked version will override any installed version of `@1inch/cross-chain-sdk`
+- Remember to unlink when switching back to the published version
+- Changes to the SDK's `package.json` may require relinking
