@@ -1,4 +1,5 @@
 import {Address, NetworkEnum} from '@1inch/fusion-sdk'
+import {LocalNetworkEnum} from './chains'
 
 const TrueERC20 = new Address('0xda0000d4000015a526378bb6fafc650cea5966f8')
 const ZKTrueERC20 = new Address('0xd66097c27eb8dee404bac235737932260edc6f3b')
@@ -19,8 +20,8 @@ export const TRUE_ERC20 = {
     [NetworkEnum.LINEA]: TrueERC20,
     [NetworkEnum.SONIC]: TrueERC20,
     [NetworkEnum.UNICHAIN]: TrueERC20,
-    [11155111]: SepoliaTrueERC20, // Sepolia
-    [10143]: MonadTrueERC20 // Monadtestnet
+    [NetworkEnum.SEPOLIA]: SepoliaTrueERC20, // Sepolia
+    [NetworkEnum.MONAD]: MonadTrueERC20 // Monadtestnet
 }
 
 const ESCROW_FACTORY_ADDRESS = new Address(
@@ -74,8 +75,8 @@ export const ESCROW_SRC_IMPLEMENTATION = {
     [NetworkEnum.LINEA]: ESCROW_SRC_IMPLEMENTATION_ADDRESS,
     [NetworkEnum.SONIC]: ESCROW_SRC_IMPLEMENTATION_ADDRESS,
     [NetworkEnum.UNICHAIN]: ESCROW_SRC_IMPLEMENTATION_ADDRESS,
-    [11155111]: SEPOLIA_ESCROW_SRC_IMPLEMENTATION_ADDRESS, // Sepolia
-    [10143]: MONAD_ESCROW_SRC_IMPLEMENTATION_ADDRESS // Monadtestnet
+    [LocalNetworkEnum.SEPOLIA]: SEPOLIA_ESCROW_SRC_IMPLEMENTATION_ADDRESS, // Sepolia
+    [LocalNetworkEnum.MONAD]: MONAD_ESCROW_SRC_IMPLEMENTATION_ADDRESS // Monadtestnet
 }
 
 export const ESCROW_DST_IMPLEMENTATION = {
@@ -92,8 +93,8 @@ export const ESCROW_DST_IMPLEMENTATION = {
     [NetworkEnum.LINEA]: ESCROW_DST_IMPLEMENTATION_ADDRESS,
     [NetworkEnum.SONIC]: ESCROW_DST_IMPLEMENTATION_ADDRESS,
     [NetworkEnum.UNICHAIN]: ESCROW_DST_IMPLEMENTATION_ADDRESS,
-    [11155111]: SEPOLIA_ESCROW_DST_IMPLEMENTATION_ADDRESS, // Sepolia
-    [10143]: MONAD_ESCROW_DST_IMPLEMENTATION_ADDRESS // Monadtestnet
+    [LocalNetworkEnum.SEPOLIA]: SEPOLIA_ESCROW_DST_IMPLEMENTATION_ADDRESS, // Sepolia
+    [LocalNetworkEnum.MONAD]: MONAD_ESCROW_DST_IMPLEMENTATION_ADDRESS // Monadtestnet
 }
 
 export const ESCROW_FACTORY = {
@@ -110,6 +111,6 @@ export const ESCROW_FACTORY = {
     [NetworkEnum.LINEA]: ESCROW_FACTORY_ADDRESS,
     [NetworkEnum.SONIC]: ESCROW_FACTORY_ADDRESS,
     [NetworkEnum.UNICHAIN]: ESCROW_FACTORY_ADDRESS,
-    [11155111]: SEPOLIA_ESCROW_FACTORY_ADDRESS, // Sepolia
-    [10143]: MONAD_ESCROW_FACTORY_ADDRESS // Monadtestnet
+    [LocalNetworkEnum.SEPOLIA]: SEPOLIA_ESCROW_FACTORY_ADDRESS, // Sepolia
+    [LocalNetworkEnum.MONAD]: MONAD_ESCROW_FACTORY_ADDRESS // Monadtestnet
 }

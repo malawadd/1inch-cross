@@ -1,6 +1,11 @@
 import {NetworkEnum} from '@1inch/fusion-sdk'
 import {TupleToUnion} from './type-utils'
 
+export enum LocalNetworkEnum {
+    SEPOLIA = 11155111,
+    MONAD = 10143
+}
+
 export const SupportedChains = [
     NetworkEnum.ETHEREUM,
     NetworkEnum.POLYGON,
@@ -14,8 +19,8 @@ export const SupportedChains = [
     NetworkEnum.LINEA,
     NetworkEnum.SONIC,
     NetworkEnum.UNICHAIN,
-    11155111, // Sepolia
-    10143 // Monadtestnet
+    NetworkEnum.SEPOLIA,
+    NetworkEnum.MONAD
 ] as const
 
 type UnsupportedChain = Exclude<

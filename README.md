@@ -9,21 +9,40 @@ This guide is for team members who need to use a locally developed version of th
 
 ## Setting Up the SDK for Local Development
 
-### 1. Clone and Setup the SDK Repository
+### 1. Clone and Link the Required Fusion SDK
+
+Before building this SDK, you must clone and link the required [fusion-sdk-1inch](https://github.com/malawadd/fusion-sdk-1inch) package:
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd cross-chain-sdk
+# Clone the fusion-sdk-1inch repository (if you haven't already)
+git clone https://github.com/malawadd/fusion-sdk-1inch.git
+cd fusion-sdk-1inch
+
+# Install dependencies and build
+pnpm install
+pnpm build
+pnpm link --global
+```
+
+### 2. Clone and Setup the Cross Chain SDK Repository
+
+```bash
+# Go to the cross-chain-sdk directory
+
+git clone  https://github.com/malawadd/1inch-cross
+cd 1inch-cross
 
 # Install dependencies
 pnpm install
+
+# Link the package globally
+pnpm link --global @1inch/fusion-sdk
 
 # Build the SDK
 pnpm build
 ```
 
-### 2. Create a Global Link
+### 3. Create a Global Link for the Cross Chain SDK
 
 ```bash
 # Create a global symlink for the SDK
