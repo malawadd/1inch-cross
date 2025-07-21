@@ -13,7 +13,9 @@ export const SupportedChains = [
     NetworkEnum.ZKSYNC,
     NetworkEnum.LINEA,
     NetworkEnum.SONIC,
-    NetworkEnum.UNICHAIN
+    NetworkEnum.UNICHAIN,
+    11155111, // Sepolia
+    10143 // Monadtestnet
 ] as const
 
 type UnsupportedChain = Exclude<
